@@ -2,10 +2,10 @@ const Sequelize = require( 'sequelize' );
 const db = require( '../config/config' );
 // Model comments
 const Comments = db.define( 'comments', {
-    user_id: {
+    userId: {
         type: Sequelize.INTEGER,
     },
-    post_id: {
+    postId: {
         type: Sequelize.INTEGER,
     },
     comment: {

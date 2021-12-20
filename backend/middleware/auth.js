@@ -6,7 +6,7 @@ module.exports = (req, res, next) => {
         const decodedToken = jwt.verify( token, 'RANDOM_SECRET_KEY' );
         const user = decodedToken.user;
         // console.log(user.id);
-        if ((req.body.user_id && req.body.user_id !== user.id) || req.body.admin === 1 ) {
+        if ((req.body.userId && req.body.userId !== user.id) || req.body.admin === 1 ) {
             // console.log(req.body.user_id);
             res.status( 401 ).json( {
                 error: new Error( 'Invalid request !' )
