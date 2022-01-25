@@ -46,4 +46,11 @@ exports.login = (req, res, next) => {
         .catch( error => res.status( 500 ).json( {error} ) );
 };
 
+exports.getUserInfos = (req, res, next) => {
+    // console.log( 'body => ', req.body )
+    models.Users.findOne( {
+        where: { email: req.body.email}
+    } ).then( (user) => res.status( 201 ).json( {data: user} ) )
+        .catch( () => res.status( 400 ).json( {message: 'utilisateur deja existant'} ) )
+};
 

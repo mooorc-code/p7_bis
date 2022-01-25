@@ -73,10 +73,10 @@ export default {
   },
   computed: {
 
-    ...mapState( ['status'] )
+    ...mapState( ['status', 'userInfos'] )
   },
   methods: {
-    signup: () => {
+    signup()  {
       // console.log(this.email, this.prenom,this.nom,this.password,this.poste, this.avatar )
 
       this.$store.dispatch( 'signup', {
@@ -88,6 +88,17 @@ export default {
         avatar: this.avatar,
       } ).then( () => {
         this.login();
+      }, (error) => {
+        console.log( error );
+      } )
+    },
+    login() {
+      this.$store.dispatch( 'login', {
+        email: this.email,
+        password: this.password,
+      } ).then( () => {
+        this.$store.dispatch( 'getUserInfos', {email: this.email}  );
+        this.$router.push( 'profile' );
       }, (error) => {
         console.log( error );
       } )

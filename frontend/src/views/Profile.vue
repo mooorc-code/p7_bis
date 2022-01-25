@@ -23,7 +23,7 @@ export default {
       this.$router.push( '/Login' );
       return;
     }
-    this.$store.dispatch( 'getUserInfos' );
+    // this.$store.dispatch( 'getUserInfos'  );
   },
   computed: {
     ...mapState( {
@@ -31,7 +31,7 @@ export default {
     } )
   },
   methods: {
-    logout: () => {
+    logout() {
       this.$store.commit( 'logout' );
       this.$router.push( '/Login' );
     }

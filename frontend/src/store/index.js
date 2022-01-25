@@ -1,4 +1,5 @@
 import Vuex from 'vuex'
+
 const axios = require( 'axios' )
 import createPersistedState from 'vuex-persistedstate';
 
@@ -26,7 +27,6 @@ if (!user) {
 }
 
 // créer une instance
-
 export default new Vuex.Store( {
     plugins: [createPersistedState()],
 
@@ -38,7 +38,7 @@ export default new Vuex.Store( {
             nom: '',
             prenom: '',
             poste: '',
-            password:'',
+            password: '',
             avatar: '',
         },
     },
@@ -51,9 +51,12 @@ export default new Vuex.Store( {
             localStorage.setItem( 'user', JSON.stringify( user ) );
             state.user = user;
         },
-        userInfos: (state, userInfos) => {
+        getUserInfos: (state, userInfos) => {
             state.userInfos = userInfos;
         },
+        logout: (state)=> {
+            state.userInfos = {}
+        }
     },
     actions: {
         login: ({commit}, userInfos) => {
@@ -86,6 +89,24 @@ export default new Vuex.Store( {
                         reject( error );
                     } );
             } );
+        },
+        getUserInfos: ({commit}, userInfos) => {
+            return new Promise( (resolve, reject) => {
+                console.log( userInfos )
+                instance.post( '/user', userInfos )
+                    .then( (response) => {
+                        console.log(response)
+                        commit( 'getUserInfos', response.data.data );
+                        resolve( response );
+                    } )
+                    .catch( (error) => {
+                        commit( 'getUserInfos', {} );
+                        reject( error );
+                    } );
+            } );
+        },
+        logout:  () =>{
+            localStorage.removeItem('user')
         }
     },
 } )

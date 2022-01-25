@@ -52,16 +52,16 @@ export default {
   },
 
   computed: {
-    ...mapState( ['status'] )
+    ...mapState( ['status', 'userInfos'] )
   },
 
   methods: {
-    login: () => {
+    login() {
       this.$store.dispatch( 'login', {
         email: this.email,
         password: this.password,
       } ).then( () => {
-        console.log("ici")
+        this.$store.dispatch( 'getUserInfos', {email: this.email}  );
         this.$router.push( 'profile' );
       }, (error) => {
         console.log( error );
