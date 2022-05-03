@@ -36,11 +36,13 @@
                 </div>
 
                 <div class="form-outline form-white mb-4">
-                  <input v-model="avatar" type="text" id="typeAvatarX" class="form-control form-control-lg"/>
+                  <input v-on:change="avatar" id="typeAvatarX" type="file" ref="fileInput" class="form-control form-control-lg"/>
                   <label class="form-label" for="typeAvatarX">Avatar</label>
                 </div>
 
-                <button @click="signup()" class="button btn btn-outline-light btn-lg px-5" type="submit">Créer un compte</button>
+                <button @click="signup($event)" class="button btn btn-outline-light btn-lg px-5" type="submit">Créer un
+                  compte
+                </button>
               </div>
               <div>
                 <p class="m-0">Tu as déjà un compte ?
@@ -66,19 +68,19 @@ export default {
       email: '',
       nom: '',
       prenom: '',
-      password:'',
+      password: '',
       poste: '',
       avatar: '',
     }
   },
   computed: {
 
-    ...mapState( ['status', 'userInfos'] )
+    ...mapState( ['status', 'user'] )
   },
   methods: {
-    signup()  {
+    signup(e) {
       // console.log(this.email, this.prenom,this.nom,this.password,this.poste, this.avatar )
-
+      e.preventDefault()
       this.$store.dispatch( 'signup', {
         email: this.email,
         nom: this.nom,
@@ -92,13 +94,15 @@ export default {
         console.log( error );
       } )
     },
+
+
     login() {
       this.$store.dispatch( 'login', {
         email: this.email,
         password: this.password,
       } ).then( () => {
-        this.$store.dispatch( 'getUserInfos', {email: this.email}  );
-        this.$router.push( 'profile' );
+        this.$store.dispatch( 'getUserInfosById', {email: this.email} );
+        this.$router.push( 'home' );
       }, (error) => {
         console.log( error );
       } )

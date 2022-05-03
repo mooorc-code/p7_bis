@@ -5,25 +5,21 @@
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
           <div class="card bg-dark text-white" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
-
-              <div class="mb-md-5 mt-md-4 pb-5">
-
+              <form class="mb-md-5 mt-md-4 pb-5">
                 <h2 class="fw-bold mb-2 text-uppercase">Connexion</h2>
-                <form class="form-outline form-white mb-4">
-                  <input v-model="email" type="email" id="typeEmailX" class="form-control form-control-lg"
+                <div class="form-group">
+                  <input  v-model="email" type="email" id="typeEmailX" class="form-control form-control-lg"
                          placeholder="Enter email"/>
                   <label class="form-label" for="typeEmailX">Email</label>
-                </form>
-
-                <form class="form-outline form-white mb-4">
-                  <input v-model="password" type="password" id="typePasswordX" class="form-control form-control-lg">
+                </div>
+                <div class="form-group">
+                  <input v-model="password" type="password" placeholder="Enter password" id="typePasswordX"
+                         class="form-control form-control-lg">
                   <label class="form-label" for="typePasswordX">Mot de passe</label>
-                </form>
-
-                <button @click="login()" class="button btn btn-outline-light btn-lgpx-5">Connexion
+                </div>
+                <button @click="login($event)" class="button btn btn-outline-light" >Connexion
                 </button>
-
-              </div>
+              </form>
 
               <div>
                 <p class="m-0">Tu n'as pas encore de compte ?
@@ -48,6 +44,7 @@ export default {
     return {
       email: '',
       password: '',
+      token:'',
     }
   },
 
@@ -56,13 +53,14 @@ export default {
   },
 
   methods: {
-    login() {
+    login(e) {
+      e.preventDefault()
       this.$store.dispatch( 'login', {
         email: this.email,
         password: this.password,
       } ).then( () => {
-        this.$store.dispatch( 'getUserInfos', {email: this.email}  );
-        this.$router.push( 'profile' );
+        this.$store.dispatch( 'getUserInfosById', {email: this.email} );
+        this.$router.push( 'home' );
       }, (error) => {
         console.log( error );
       } )

@@ -22,12 +22,26 @@
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
 
+
 export default {
   name: "App",
   components: {
     "header-top": Header,
     "footer-bottom": Footer,
+
   },
+  computed: {
+    isLog: () => {
+      return this.$store.getters.isLog;
+    }
+  },
+  methods: {
+    logout: () => {
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push("login");
+      });
+    }
+  }
 };
 </script>
 
@@ -48,37 +62,33 @@ body {
 nav {
   background-color: rgb(17, 37, 65);
   color: #fff;
-
-}
-
-nav ul {
-  display: flex;
-  align-items: center;
-}
-
-nav li {
-  list-style: none;
+  ul {
+    display: flex;
+    align-items: center;
+    li {
+      list-style: none;
+      a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 5px 20px;
+      }
+      a:hover {
+        color: yellow;
+        text-decoration: none;
+      }
+    }
+  }
+  .router-link-exact-active {
+    color: #FF4924;
+  }
 }
 
 .right_place {
   margin-left: auto;
 }
 
-nav li a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 5px 20px;
-}
 
-nav a:hover {
-  color: yellow;
-  text-decoration: none;
-}
-
-nav .router-link-exact-active {
-  color: #FF4924;
-}
 
 .logo-header {
   height: 45px;

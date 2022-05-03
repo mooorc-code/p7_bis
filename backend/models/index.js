@@ -7,9 +7,12 @@ const Comments = require( './comments' );
 Users.hasMany( Posts );
 Users.hasMany( Comments );
 // Users.hasMany(Likes);
-Posts.hasMany( Comments );
+Posts.hasMany( Comments, {
+    onDelete: 'CASCADE', hooks:true
+} );
 // Posts.hasMany(Likes);
 Posts.belongsTo( Users );
+
 Comments.belongsTo( Users );
 Comments.belongsTo( Posts );
 // Likes.belongsTo(Users);

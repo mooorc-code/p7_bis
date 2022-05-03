@@ -1,36 +1,25 @@
 <template>
-  <div class="card">
-    <h1 class="card-title">Espace Perso</h1>
-    <p class="card-subtitle">Voilà donc qui je suis...</p>
-    <p>{{ user.prenom }} {{ user.nom }} {{ user.email }} {{ user.poste }}</p>
-    <img :src="user.avatar"/>
-    <div class="form-row">
-      <button @click="logout()" class="button">
-        Déconnexion
-      </button>
-    </div>
+  <div class="container">
+    <profil></profil>
   </div>
+
 </template>
 
 <script>
 import {mapState} from 'vuex'
+import profil from "@/components/profil";
 
 export default {
   name: "Profile",
-  mounted: function () {
-    console.log( this.$store.state.user );
-    if (this.$store.state.user.userId === -1) {
-      this.$router.push( '/Login' );
-      return;
-    }
-    // this.$store.dispatch( 'getUserInfos'  );
+
+  components:{
+    profil,
   },
-  computed: {
-    ...mapState( {
-      user: 'userInfos',
-    } )
+  computed:
+      {    ...mapState( ["user"] )
   },
   methods: {
+
     logout() {
       this.$store.commit( 'logout' );
       this.$router.push( '/Login' );
@@ -39,6 +28,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang='scss'>
+.card {
+  margin-bottom: 15px;
+}
 
+.img-profile {
+  width: 200px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1px solid darkcyan;
+}
 </style>
