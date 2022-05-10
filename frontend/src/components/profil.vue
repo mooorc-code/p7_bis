@@ -3,20 +3,20 @@
     <h1>Informations personnelles</h1>
     <div class="container">
       <div class="card-body">
-        <div class="card img-profile"><p>{{user.avatar}}</p></div>
-        <div class="card"><p>{{user.nom}} {{user.prenom}}</p></div>
-        <div class="card"><p>{{user.email}}</p></div>
-        <div class="card"><p>{{user.poste}}</p></div>
+        <div class="card img-profile"><img :src="user.avatar" alt="avatar"></div>
+        <div class="card"><p>{{ user.nom }} {{ user.prenom }}</p></div>
+        <div class="card"><p>{{ user.email }}</p></div>
+        <div class="card"><p>{{ user.poste }}</p></div>
         <div>
           <p class="m-0 ">
-            <router-link to="editProfil" replace class="text-decoration-none text-black-50">Modifier le profile</router-link>
+            <router-link to="editProfil" replace class="text-decoration-none text-black-50">Modifier le profile
+            </router-link>
           </p>
         </div>
-        <button class="btn text-decoration-none">supprimer le profil</button>
+        <button @click="deleteUser($event)" class="btn text-decoration-none">supprimer le profil</button>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -39,14 +39,19 @@ export default {
     this.user = userTmp.userId
   },
   computed:
-      {    ...mapState( ["user"] )
+      {
+        ...mapState( ["user"] )
       },
   methods: {
-    logout() {
-      this.$store.commit( 'logout' );
-      this.$router.push( '/Login' );
-    }
+    deleteUser: (event) => {
+      event.preventDefault();
+      this.$store.dispatch( "deleteUser").then( () => {
+        this.$router.push( "/" );
+      } );
+    },
   }
+
+
 }
 </script>
 

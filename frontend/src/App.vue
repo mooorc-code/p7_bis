@@ -35,13 +35,6 @@ export default {
       return this.$store.getters.isLog;
     }
   },
-  methods: {
-    logout: () => {
-      this.$store.dispatch("logout").then(() => {
-        this.$router.push("login");
-      });
-    }
-  }
 };
 </script>
 

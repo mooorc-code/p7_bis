@@ -60,11 +60,11 @@ export default new Vuex.Store( {
         getUserInfosById: (state, userInfos) => {
             state.userInfos = userInfos;
         },
-        editUser: (state, userInfos) => {
-            state.userInfos = userInfos
+        editUser: (state, user) => {
+            state.user= user
         },
-        deleteUser: (state, userInfos) => {
-            state.userInfos = userInfos
+        deleteUser: (state, user) => {
+            state.user = user
         },
         setPost: (state, post) => {
             state.post = post
@@ -90,9 +90,6 @@ export default new Vuex.Store( {
         },
         deleteComment : (state, comment) =>{
             state.comment = comment
-        },
-        logout: (state) => {
-            state.userInfos = {}
         },
 
 
@@ -145,10 +142,10 @@ export default new Vuex.Store( {
                     } );
             } );
         },
-        editUser: ({commit}, userInfos) => {
+        editUser: ({commit}, user) => {
             return new Promise( (resolve, reject) => {
-                console.log( userInfos )
-                axios.put( 'http://localhost:5000/api/user/user/'+ userInfos.id, userInfos, {headers: {'Authorization': 'Bearer ' + user.token}} )
+                console.log( user )
+                instance.put( '/user/'+ user.id )
                     .then( (response) => {
                         console.log( response )
                         commit( 'editUser', response.data.data );
@@ -160,10 +157,10 @@ export default new Vuex.Store( {
                     } );
             } );
         },
-        deleteUser: ({commit}, userInfos) => {
+        deleteUser: ({commit}, user) => {
             return new Promise( (resolve, reject) => {
-                console.log( userInfos )
-                axios.delete( 'http://localhost:5000/api/user/user' + this.id ,{headers: {'Authorization': 'Bearer ' + user.token}} )
+                console.log( user )
+                instance.delete( '/user/' + this.id ,)
                     .then( (response) => {
                         console.log( response )
                         commit( 'deleteUser', response.data.data );
@@ -255,9 +252,7 @@ export default new Vuex.Store( {
             } );
         },
 
-        logout: () => {
-            localStorage.removeItem( 'user' )
-        }
+
     },
 } )
 

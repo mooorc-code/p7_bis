@@ -49,7 +49,7 @@ export default {
   },
 
   computed: {
-    ...mapState( ['status', 'userInfos'] )
+    ...mapState( ['status'] )
   },
 
   methods: {
