@@ -1,50 +1,23 @@
 import Vuex from 'vuex'
-
-const axios = require( 'axios' )
 import createPersistedState from 'vuex-persistedstate';
 
-const instance = axios.create( {
-    baseURL: 'http://localhost:5000/api/auth/'
-} );
-
-let user = localStorage.getItem( 'user' );
-if (!user) {
-    user = {
-        userId: {},
-        token: '',
-    };
-} else {
-    try {
-        user = JSON.parse( user );
-        instance.defaults.headers.common['Authorization'] = user.token;
-    } catch (ex) {
-        user = {
-            userId: {},
-            token: '',
-        };
-    }
-}
+import instance from "@/configAxios";
 
 
-// créer une instance
 export default new Vuex.Store( {
     plugins: [createPersistedState()],
 
     state: {
+        user: '',
+        token: '',
         status: '',
-        user: user,
-        userInfos: {
-            email: '',
-            nom: '',
-            prenom: '',
-            poste: '',
-            password: '',
-            avatar: '',
-        },
         post: "",
         posts: [],
         comment: "",
         comments: [],
+        likes: [],
+        userInfos:{},
+        currentPost:{},
     },
 
 
@@ -52,17 +25,20 @@ export default new Vuex.Store( {
         setStatus: (state, status) => {
             state.status = status;
         },
+        setCurrentPost: (state, status) => {
+            state.currentPost = status;
+        },
         logUser: (state, user) => {
-            instance.defaults.headers.common['Authorization'] = user.token;
-            localStorage.setItem( 'user', JSON.stringify( user ) );
+            localStorage.setItem( 'token', user.token );
             state.user = user;
         },
         getUserInfosById: (state, userInfos) => {
             state.userInfos = userInfos;
         },
         editUser: (state, user) => {
-            state.user= user
+            state.user = user
         },
+
         deleteUser: (state, user) => {
             state.user = user
         },
@@ -70,7 +46,7 @@ export default new Vuex.Store( {
             state.post = post
         },
         setPosts: (state, posts) => {
-            console.log(posts);
+
             state.posts = posts
         },
         editPost: (state, post) => {
@@ -79,19 +55,24 @@ export default new Vuex.Store( {
         deletePost: (state, post) => {
             state.post = post
         },
-        setComment : (state, comment) =>{
+        setComment: (state, comment) => {
             state.comment = comment
         },
-        setComments : (state, comments) =>{
+        setComments: (state, comments) => {
             state.comments = comments
         },
-        editComment : (state, comment) =>{
+        editComment: (state, comment) => {
             state.comment = comment
         },
-        deleteComment : (state, comment) =>{
+        deleteComment: (state, comment) => {
             state.comment = comment
         },
-
+        liked: (state, like) => {
+            state.likes = like
+        },
+        disliked: (state, like) => {
+            state.likes = like
+        }
 
 
     },
@@ -99,8 +80,8 @@ export default new Vuex.Store( {
         login: ({commit}, user) => {
             commit( 'setStatus' );
             return new Promise( (resolve, reject) => {
-                console.log( user )
-                instance.post( '/login', user )
+
+                instance.post( '/auth/login', user )
                     .then( (response) => {
                         commit( 'setStatus', '' );
                         commit( 'logUser', response.data );
@@ -115,10 +96,11 @@ export default new Vuex.Store( {
         signup: ({commit}, user) => {
             commit( 'setStatus' );
             return new Promise( (resolve, reject) => {
-                console.log( user )
-                instance.post( '/signup', user )
+                console.log("ici")
+                instance.post( '/auth/signup', user )
                     .then( (response) => {
-                        commit( 'setStatus', 'created' );
+                        commit( 'setStatus', 'created', '' );
+                        commit( 'logUser', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -127,28 +109,32 @@ export default new Vuex.Store( {
                     } );
             } );
         },
+
         getUserInfosById: ({commit}, user) => {
             return new Promise( (resolve, reject) => {
-                console.log( user )
-                instance.post( '/user', user )
-                    .then( (response) => {
-                        console.log( response )
-                        commit( 'getUserInfosById', response.data.data );
-                        resolve( response );
-                    } )
-                    .catch( (error) => {
-                        commit( 'getUserInfosById', {} );
-                        reject( error );
-                    } );
+                {
+                    instance.post( 'auth/user', user )
+                        .then( (response) => {
+                            commit( 'getUserInfosById', response.data );
+                            resolve( response );
+                        } )
+                        .catch( (error) => {
+                            commit( 'getUserInfosById', {} );
+                            reject( error );
+                        } );
+                }
+
+
             } );
         },
-        editUser: ({commit}, user) => {
+
+        editUser: ({commit}, user ) => {
             return new Promise( (resolve, reject) => {
-                console.log( user )
-                instance.put( '/user/'+ user.id )
+                instance.put( 'auth/user/update/' ,user)
                     .then( (response) => {
-                        console.log( response )
-                        commit( 'editUser', response.data.data );
+
+                        commit( 'editUser', response.data );
+                        commit('getUserInfosById');
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -157,13 +143,27 @@ export default new Vuex.Store( {
                     } );
             } );
         },
-        deleteUser: ({commit}, user) => {
+        editPassword:  ({commit}, user ) => {
             return new Promise( (resolve, reject) => {
-                console.log( user )
-                instance.delete( '/user/' + this.id ,)
+                instance.put( 'auth/userPassword' ,user)
                     .then( (response) => {
-                        console.log( response )
-                        commit( 'deleteUser', response.data.data );
+
+                        commit( 'editUser', response.data );
+                        resolve( response );
+                    } )
+                    .catch( (error) => {
+                        commit( 'editUser', {} );
+                        reject( error );
+                    } );
+            } );
+        },
+        deleteUser: ({commit}, user ) => {
+
+            return new Promise( (resolve, reject) => {
+                console.log(user.id)
+                instance.delete( '/auth/user/delete/'+ user.id, user)
+                    .then( (response) => {
+                        commit( 'deleteUser', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -174,13 +174,15 @@ export default new Vuex.Store( {
         },
 
 
+
+
         createPost: ({commit}, post) => {
             return new Promise( (resolve, reject) => {
-                console.log( post )
-                axios.post( 'http://localhost:5000/api/post', post, {headers: {'Authorization': 'Bearer ' + user.token}} )
+
+                instance.post( '/post/', post )
                     .then( (response) => {
-                        console.log( response )
-                        commit( 'setPost', response.data.data );
+
+                        commit( 'setPost', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -189,13 +191,18 @@ export default new Vuex.Store( {
                     } );
             } );
         },
+        createCurrentPost: ({commit}, post) => {
+            return new Promise( () => {
+                commit("setCurrentPost", post)
+
+            } );
+        },
 
         getAllPosts: ({commit}) => {
             return new Promise( (resolve, reject) => {
-
-                axios.get( 'http://localhost:5000/api/post/post', {headers: {'Authorization': 'Bearer ' + user.token}} )
+                instance.get( '/post/post' )
                     .then( (response) => {
-                        console.log( response )
+
                         commit( 'setPosts', response.data );
                         resolve( response );
                     } )
@@ -205,12 +212,25 @@ export default new Vuex.Store( {
                     } );
             } );
         },
-        deletePost: ({commit}, post) => {
+
+        modifyPost: ({commit}, currentPost) => {
             return new Promise( (resolve, reject) => {
-                axios.delete( 'http://localhost:5000/api/post/post/' + post.id ,{headers: {'Authorization': 'Bearer ' + user.token}} )
+                instance.put( '/post/post/update/', currentPost )
                     .then( (response) => {
-                        console.log( response )
-                        commit( 'deletePost', response.data.data );
+                        commit( 'setPost', response.data );
+                        resolve( response );
+                    } )
+                    .catch( (error) => {
+                        commit( 'setPost', {} );
+                        reject( error );
+                    } );
+            } );
+        },
+        deletePost: ({commit}, postId) => {
+            return new Promise( (resolve, reject) => {
+                instance.delete( '/post/post/delete/' + postId )
+                    .then( (response) => {
+                        commit( 'deletePost', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -222,11 +242,11 @@ export default new Vuex.Store( {
 
         createComment: ({commit}, comment) => {
             return new Promise( (resolve, reject) => {
-                console.log( comment )
-                axios.post( 'http://localhost:5000/api/comment/'+ comment.postId, comment,  {headers: {'Authorization': 'Bearer ' + user.token}} )
+
+                instance.post( '/comment/' + comment.postId, comment )
                     .then( (response) => {
-                        console.log( response )
-                        commit( 'setComment', response.data.data );
+
+                        commit( 'setComment', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
@@ -238,15 +258,46 @@ export default new Vuex.Store( {
 
         deleteComment: ({commit}, comment) => {
             return new Promise( (resolve, reject) => {
-                console.log( comment )
-                axios.delete( 'http://localhost:5000/api/comment/' + comment.id ,{headers: {'Authorization': 'Bearer ' + user.token}} )
+
+                instance.delete( '/comment/' + comment.id )
                     .then( (response) => {
-                        console.log( response )
+
                         commit( 'deleteComment', response.data );
                         resolve( response );
                     } )
                     .catch( (error) => {
                         commit( 'deleteComment', {} );
+                        reject( error );
+                    } );
+            } );
+        },
+
+        liked: ({commit}, likes) => {
+            return new Promise( (resolve, reject) => {
+
+                instance.post( '/post/post/likes/' + likes.postId )
+                    .then( (response) => {
+
+                        commit( 'setPost', response.data );
+                        resolve( response );
+                    } )
+                    .catch( (error) => {
+                        commit( 'setPost', {} );
+                        reject( error );
+                    } );
+            } );
+        },
+        disliked: ({commit}, likes,) => {
+            return new Promise( (resolve, reject) => {
+
+                instance.delete( '/post/post/likes/' + likes.postId )
+                    .then( (response) => {
+
+                        commit( 'setPost', response.data );
+                        resolve( response );
+                    } )
+                    .catch( (error) => {
+                        commit( 'setPost', {} );
                         reject( error );
                     } );
             } );

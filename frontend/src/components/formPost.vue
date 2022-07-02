@@ -1,5 +1,5 @@
 <template>
-  <section class=" container ">
+  <section class=" container col-md-8 offset-md-2 col-lg-8 offset-lg-2">
 
     <div class="card">
       <div class="card-body">
@@ -42,7 +42,7 @@ export default {
     }
   },
   computed: {
-    ...mapState( ["userInfos", "user"] )
+    ...mapState( ["user"] )
   },
 
   methods: {
@@ -53,13 +53,12 @@ export default {
     createPost(event) {
       event.preventDefault();
       let formData = new FormData()
-      let user = JSON.parse( localStorage.getItem( 'user' ) );
-
       formData.append( 'image', this.selectedFile )
       formData.append( 'publication', this.message )
-      formData.append( 'userId', user.userId.id )
 
       this.$store.dispatch("createPost", formData).then(() => {
+        this.message = null
+        this.selectedFile = null
         this.$store.dispatch("getAllPosts");
       });
 

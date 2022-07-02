@@ -9,10 +9,12 @@ const userCtrl = require('../controllers/user');
 const multer = require( '../middleware/multer-config');
 
 // Routes users
-router.post('/signup', password, validator,userCtrl.signup);
+router.post('/signup',multer, password, validator,userCtrl.signup);
 router.post('/login', limiter, userCtrl.login);
-router.post('/user', userCtrl.getUserInfosById );
-router.put('/user/:id', multer, userCtrl.updateUser);
-router.delete('/user/:id', userCtrl.deleteUser);
+router.post('/user', auth, userCtrl.getUserInfosById );
+router.put('/user/update', multer, userCtrl.updateUser);
+router.delete('/user/delete/:id',auth, userCtrl.deleteUser);
+router.post('/user/:id', auth, userCtrl.updateUser);
+router.put('/userPassword', userCtrl.updatePW)
 
 module.exports = router;

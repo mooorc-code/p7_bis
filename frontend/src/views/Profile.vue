@@ -18,10 +18,8 @@ export default {
   computed:
       {    ...mapState( ["user"] )
   },
-  methods: {
 
 
-  }
 }
 </script>
 
@@ -31,9 +29,13 @@ export default {
 }
 
 .img-profile {
-  width: 200px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 1px solid darkcyan;
+  border: none;
+  img{
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid black;
+    max-width: 200px;
+  }
 }
 </style>

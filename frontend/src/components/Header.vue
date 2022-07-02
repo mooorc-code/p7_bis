@@ -8,7 +8,7 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div id="navbarContent" class="collapse navbar-collapse">
-            <div v-if="user.token == null">
+            <div v-if="this.token === ''">
               <li class="nav-link">
                 <router-link to="/" class="nav-link">Connexion</router-link>
               </li>
@@ -25,7 +25,9 @@
                 <li class="nav-link">
                   <router-link to="/profile" class="nav-link">Profil</router-link>
                 </li>
-                <li @click="logout($event)" class="nav-item nav-link ">Déconnexion</li>
+                <li class="nav-item nav-link ">
+                  <a @click="logout($event)" class="nav-link ">Déconnexion</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -37,29 +39,36 @@
 
 
 <script>
-import {mapState} from "vuex";
+import {mapActions, mapState} from "vuex";
 
 export default {
   name: "Header",
-  mounted() {
-    let userTmp = JSON.parse( localStorage.getItem( 'user' ) );
-    this.user = userTmp.userId
-  },
+
+
   computed: {
-    ...mapState( ["user"] )
+    ...mapState( ["user", "status", "userInfos"] ),
+    token(){
+      return  localStorage.getItem('token') || ''
+    }
+  },
+  mounted() {
+
+    if (this.user.token) {
+      this.getUserInfosById()
+    }
+
   },
 
+
   methods: {
-    isLog: () => {
-    },
+    ...mapActions( ["getUserInfosById"] ),
 
     logout: (event) => {
       event.preventDefault()
       localStorage.clear()
-      this.$router.push( '/' )
+      window.location = "/"
     }
   },
-
 }
 
 </script>

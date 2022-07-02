@@ -6,7 +6,7 @@
           <div class="card bg-dark text-white" style="border-radius: 1rem;">
             <div class="card-body p-5 text-center">
 
-              <div class="mb-md-5 mt-md-4 pb-5">
+              <form class="mb-md-5 mt-md-4 pb-5">
 
                 <h2 class="fw-bold mb-2 text-uppercase">Inscription</h2>
 
@@ -36,14 +36,16 @@
                 </div>
 
                 <div class="form-outline form-white mb-4">
-                  <input v-on:change="avatar" id="typeAvatarX" type="file" ref="fileInput" class="form-control form-control-lg"/>
+                  <input v-on:change="upload" id="typeAvatarX" type="file" ref="fileInput"
+                         class="form-control form-control-lg"/>
                   <label class="form-label" for="typeAvatarX">Avatar</label>
                 </div>
 
-                <button @click="signup($event)" class="button btn btn-outline-light btn-lg px-5" type="submit">Créer un
+                <button @click="createUser($event)" class="button btn btn-outline-light btn-lg px-5" type="submit">Créer
+                  un
                   compte
                 </button>
-              </div>
+              </form>
               <div>
                 <p class="m-0">Tu as déjà un compte ?
                   <router-link to="/Login" class="text-decoration-none text-white-50 fw-bold">Se connecter</router-link>
@@ -59,54 +61,51 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default {
   name: "Signup",
   data: () => {
     return {
-      email: '',
-      nom: '',
-      prenom: '',
-      password: '',
-      poste: '',
-      avatar: '',
+      selectedFile: null,
+      file: '',
+      response: [],
     }
   },
   computed: {
 
-    ...mapState( ['status', 'user'] )
+    ...mapState( ['status'] )
   },
   methods: {
-    signup(e) {
-      // console.log(this.email, this.prenom,this.nom,this.password,this.poste, this.avatar )
-      e.preventDefault()
-      this.$store.dispatch( 'signup', {
-        email: this.email,
-        nom: this.nom,
-        prenom: this.prenom,
-        password: this.password,
-        poste: this.poste,
-        avatar: this.avatar,
-      } ).then( () => {
-        this.login();
-      }, (error) => {
-        console.log( error );
-      } )
+    ...mapActions( ["signup"] ),
+
+    upload(event) {
+      this.selectedFile = event.target.files[0];
     },
 
+    createUser(event) {
+      event.preventDefault();
+      let formData = new FormData()
+      formData.append( 'image', this.selectedFile )
+      formData.append( 'poste', this.poste )
+      formData.append( 'email', this.email )
+      formData.append( 'password', this.password )
+      formData.append( 'prenom', this.prenom )
+      formData.append( 'nom', this.nom )
 
-    login() {
-      this.$store.dispatch( 'login', {
-        email: this.email,
-        password: this.password,
-      } ).then( () => {
-        this.$store.dispatch( 'getUserInfosById', {email: this.email} );
-        this.$router.push( 'home' );
-      }, (error) => {
-        console.log( error );
+
+      this.$store.dispatch( 'signup', formData ).then( () => {
+        this.$store.dispatch( 'login', {
+          email: this.email,
+          password: this.password,
+        } ).then( () => {
+          window.location ="/home"
+        }, (error) => {
+          console.log( error );
+        } )
+
       } )
-    },
+    }
   }
 }
 </script>

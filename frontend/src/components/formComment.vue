@@ -29,16 +29,14 @@ export default {
     }
   },
   computed: {
-    ...mapState( ["userInfos", "user"] )
+    ...mapState( [ "user"] )
   },
 
   methods: {
     createComment(event) {
       event.preventDefault();
-      let user = JSON.parse( localStorage.getItem( 'user' ) );
       let data = {
         comment: this.commentaire,
-        userId: user.userId.id,
         postId: this.postId,
       }
       this.$store.dispatch("createComment", data).then(() => {

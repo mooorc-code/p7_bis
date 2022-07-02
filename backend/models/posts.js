@@ -11,6 +11,7 @@ const Posts = db.define( 'posts', {
     image: {
         type: Sequelize.STRING,
     },
+
 }, {
     timestamps: false
 } );

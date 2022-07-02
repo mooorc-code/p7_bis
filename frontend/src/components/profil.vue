@@ -3,17 +3,17 @@
     <h1>Informations personnelles</h1>
     <div class="container">
       <div class="card-body">
-        <div class="card img-profile"><img :src="user.avatar" alt="avatar"></div>
-        <div class="card"><p>{{ user.nom }} {{ user.prenom }}</p></div>
-        <div class="card"><p>{{ user.email }}</p></div>
-        <div class="card"><p>{{ user.poste }}</p></div>
+        <div class="card img-profile"><img :src="userInfos.avatar" alt="avatar"></div>
+        <div class="card"><p>{{ userInfos.nom }} {{ userInfos.prenom }}</p></div>
+        <div class="card"><p>{{ userInfos.email }}</p></div>
+        <div class="card"><p>{{ userInfos.poste }}</p></div>
         <div>
-          <p class="m-0 ">
-            <router-link to="editProfil" replace class="text-decoration-none text-black-50">Modifier le profile
-            </router-link>
-          </p>
+          <router-link to="editProfil" class=" text-decoration-none text-black-50">Modifier le profile
+        </router-link>
+
         </div>
-        <button @click="deleteUser($event)" class="btn text-decoration-none">supprimer le profil</button>
+
+
       </div>
     </div>
   </div>
@@ -21,37 +21,20 @@
 
 <script>
 
-import {mapState} from 'vuex'
+import { mapState} from 'vuex'
 
 export default {
   name: "profil",
-  data() {
-    return {
-      user: [],
-      poste: '',
-      avatar: '',
-      email: '',
-      password: '',
-    }
-  },
-  mounted() {
-    let userTmp = JSON.parse( localStorage.getItem( 'user' ) );
-    this.user = userTmp.userId
-  },
+
   computed:
       {
-        ...mapState( ["user"] )
+        ...mapState( ["user", "status","userInfos"] )
       },
+
   methods: {
-    deleteUser: (event) => {
-      event.preventDefault();
-      this.$store.dispatch( "deleteUser").then( () => {
-        this.$router.push( "/" );
-      } );
-    },
+
+
   }
-
-
 }
 </script>
 
@@ -61,11 +44,4 @@ export default {
 }
 
 
-.img-profile {
-  width: 200px;
-  height: 200px;
-  max-width: 200px;
-  border-radius: 50%;
-  border: 1px solid darkcyan;
-}
 </style>

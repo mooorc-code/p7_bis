@@ -4,13 +4,14 @@ import Profile from "../views/Profile";
 import Signup from "../views/Signup";
 import Home from "../views/Home";
 import EditProfil from "../views/editProfil";
+import EditPassword from "../views/editPassword";
 
 
 const routes = [
 
     {
-        path: '/',
         name: 'Login',
+        path: '/',
         component: Login,
     },
     {
@@ -33,6 +34,11 @@ const routes = [
         name: 'editProfil',
         path: '/editProfil',
         component: EditProfil,
+    },
+    {
+        name: 'editPassword',
+        path: '/editPassword',
+        component: EditPassword,
     },
 
 ]

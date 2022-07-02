@@ -1,7 +1,6 @@
 <template>
   <section>
     <div class="container">
-      <button class="btn" @click="reload($event)">recharger</button>
       <div class="card">
         <div class="card-body">
           <posts>
@@ -23,21 +22,25 @@ export default {
   components: { Posts},
   computed: {
     ...mapState( [
-      'userInfos',
       'user',
       "posts"
     ] )
   },
-  methods: {
+  mounted() {
+    this.$store.dispatch("getAllPosts");
+  },
 
-    reload(event){
-      event.preventDefault();
-      this.$store.dispatch("getAllPosts");
-    }
-  }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+
+.container{
+
+  .card{
+    border: none;
+  }
+
+}
 
 </style>

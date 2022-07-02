@@ -1,12 +1,14 @@
 <template>
+  <div>
+    <router-link to="profile" class=" text-decoration-none text-black-50">retour
+    </router-link>
+  </div>
   <div class="container-fluid">
     <h1>Modifications du profile</h1>
     <div class="card">
       <div class="card-body form-white mb-4">
-        <label for="avatar" class="form-label d-flex align-items-start">Modifiez votre photo de profile</label>
+        <label for="file" class="form-label d-flex align-items-start">Modifiez votre photo de profile</label>
         <input class="form-control form-control-sm" type="file" id="file" ref="fileInput" v-on:change="upload">
-        <button @click="editUser($event)" type="submit" class="btn w-35" value="Valider">Valider
-        </button>
       </div>
     </div>
     <div class="card">
@@ -14,26 +16,27 @@
         <div class="d-flex align-items-start flex-column form">
           <h4>Votre poste</h4>
           <label class="form-label" for="poste">Modifiez votre poste:</label>
-          <input v-model="currentUser.poste" type="text" id="poste" name="Poste" class="form-control form-control-lg"/>
-          <button @click="editUser($event)" type="submit" class="btn w-35" >Valider</button>
+          <input v-model="userInfos.poste" type="text" id="poste" name="Poste" class="form-control form-control-lg"/>
+
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-body form-white mb-4">
-        <label class="form-label" for="password">Mot de passe</label>
-        <input v-model="currentUser.password" type="password" id="password" class="form-control form-control-lg"/>
-        <button @click="editUser($event)" type="submit" class="btn w-35" >Valider</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-body form-white mb-4">
         <label class="form-label" for="email">Modifiez votre email:</label>
-        <input v-model="currentUser.email" type="text" id="email" class="form-control form-control-lg"/>
-        <button @click="editUser($event)" type="submit" class="btn w-35" >Valider</button>
+        <input v-model="userInfos.email" type="text" id="email" class="form-control form-control-lg"/>
+
       </div>
     </div>
+
+    <button @click="editProfil($event)" type="submit" class="btn w-35">Valider</button>
+
+    <div>
+      <router-link to="/editPassword" class=" text-decoration-none text-black-50">Modifier le mot de passe</router-link>
+    </div>
+
+      <button @click="deleteProfil($event)"  class="btn text-decoration-none">supprimer le profil</button>
 
 
   </div>
@@ -41,52 +44,52 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default {
   name: "editProfil",
   data() {
     return {
-      currentUser: {},
       selectedFile: null,
       file: '',
       response: [],
     }
   },
-  mounted() {
-    let user = JSON.parse( localStorage.getItem( 'user' ) );
-    this.currentUser = {
-      email: user.userId.email,
-      poste: user.userId.poste,
-      avatar: user.userId.avatar,
-      id: user.userId.id
-    }
-  },
+
   computed:
-      {...mapState( ["user"] )},
+      {...mapState( ["userInfos", "user"] )},
   methods: {
+    deleteProfil(e){
+      e.preventDefault();
+      this.$store.dispatch("deleteUser",{
+        id: this.userInfos.id
+      }).then(()=>{
+        confirm("Confirmer la suppression")
+        localStorage.clear()
+        window.location = "/"
+      })
+    },
+    ...mapActions( ["editUser", "getUserInfosById", "deleteUser"] ),
+
     upload(event) {
       this.selectedFile = event.target.files[0];
-      this.currentUser = event;
     },
-    editUser(event){
+    editProfil(event) {
       event.preventDefault();
-
-      this.$store.dispatch( 'editUser', this.currentUser);
-
-      let user = JSON.parse( localStorage.getItem( 'user' ) );
-      user.userId.email = this.currentUser.email;
-      user.userId.poste = this.currentUser.poste;
-      user.userId.avatar = this.currentUser.avatar
-
-      localStorage.setItem('user', JSON.stringify(user));
+      let formData = new FormData()
+      formData.append( 'image', this.selectedFile )
+      formData.append( 'poste', this.userInfos.poste )
+      formData.append( 'email', this.userInfos.email )
+      this.editUser(
+          formData
+      )
+      alert( "Mise à jour du profil" )
+      window.location = "/profile"
 
     },
 
-    logout() {
-      this.$store.commit( 'logout' );
-      this.$router.push( '/Login' );
-    }
+
+
   }
 }
 </script>
@@ -96,11 +99,5 @@ export default {
   margin-bottom: 15px;
 }
 
-.img-profile {
-  width: 150px;
-  max-width: border-box;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 1px solid darkcyan;
-}
+
 </style>

@@ -40,13 +40,6 @@ import {mapState} from "vuex";
 
 export default {
   name: 'Login',
-  data: () => {
-    return {
-      email: '',
-      password: '',
-      token:'',
-    }
-  },
 
   computed: {
     ...mapState( ['status'] )
@@ -59,8 +52,8 @@ export default {
         email: this.email,
         password: this.password,
       } ).then( () => {
-        this.$store.dispatch( 'getUserInfosById', {email: this.email} );
-        this.$router.push( 'home' );
+        window.location ="/home"
+
       }, (error) => {
         console.log( error );
       } )

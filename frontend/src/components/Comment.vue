@@ -4,7 +4,7 @@
       <div v-if="post.comments">
         <div v-for="comment in post.comments" :key="comment" class="comment">
           <p>{{ comment.comment }}</p>
-          <button v-if="comment.userId == user.userId.id" @click="deleteComment($event, comment.id)" type="submit" class="btn btn-close"></button>
+          <button v-if="comment.userId === userInfos.id || user.admin === 1" @click="deleteComment($event, comment.id)" type="submit" class="btn btn-close"></button>
         </div>
       </div>
     </div>
@@ -19,22 +19,14 @@ import {mapState, mapActions} from "vuex";
 export default {
   name: "Comment",
   computed: {
-    ...mapState( ["posts", "comment"] ),
+    ...mapState( ["user","posts", "comment", "userInfos"] ),
     ...mapActions(["getAllPosts"]),
   },
-  data() {
-    return {
-      user: {
-        userId: {}
-      }
-    }
-  },
+
   props: {
     post: {}
   },
-  created() {
-    this.user = JSON.parse( localStorage.getItem( 'user' ) );
-  },
+
   methods: {
     deleteComment(event, commentId) {
       event.preventDefault();

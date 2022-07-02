@@ -30,11 +30,6 @@ export default {
     "footer-bottom": Footer,
 
   },
-  computed: {
-    isLog: () => {
-      return this.$store.getters.isLog;
-    }
-  },
 };
 </script>
 

@@ -2,15 +2,16 @@ const models = require( "../models/index" );
 const jwt = require( "jsonwebtoken" );
 const Posts = require( "../models/posts" );
 const Comments = require( "../models/comments" );
+const getUserFromJwt = require("../helpers/getUserFromJwt")
+const Sequelize = require('sequelize');
 
 
 // Création d'un posts //
+
 exports.createPost = (req, res, next) => {
-
-    console.log( `${req.protocol}://${req.get( 'host' )}/images/${req.file.filename}` );
-
+    const user = getUserFromJwt(req.headers.authorization);
     models.Posts.create( {
-        userId: req.body.userId,
+        userId: user,
         image: `${req.protocol}://${req.get( 'host' )}/images/${req.file.filename}`,
         publication: req.body.publication,
     } ).then( () => res.status( 201 ).json( {message: 'post créé !'} ) )
@@ -20,11 +21,27 @@ exports.createPost = (req, res, next) => {
 
 // Afficher tous les posts //
 exports.listPost = (req, res, next) => {
-    models.Posts.findAll({include: [models.Comments], order: [
-        ['id', 'desc']
+    const user = getUserFromJwt(req.headers.authorization);
+    models.Posts.findAll({
+        include: [models.Comments, models.Likes,models.Users ],
+        order: [
+            ['id', 'desc']
         ]})
         .then( (Posts) => {
-            res.status( 200 ).json( Posts );
+            let mapPost = Posts.map(post => {
+               let plainPost = post.get({
+                    plain: true
+                })
+
+                let likes = post.likes.filter(like => {
+                    return like.userId === user
+                })
+                return {
+                    myLikes : likes,
+                    ...plainPost
+                }
+            })
+            res.status( 200 ).json( mapPost );
         } )
         .catch( error => res.status( 400 ).json( {error} ) );
 
@@ -33,10 +50,12 @@ exports.listPost = (req, res, next) => {
 
 // Modifier un post //
 exports.updatePost = (req, res, next) => {
+    console.log(req.body)
+    const user = getUserFromJwt(req.headers.authorization);
     models.Posts.update(
-        {image: req.body.image, publication: req.body.publication},
+        {image: `${req.protocol}://${req.get( 'host' )}/images/${req.file.filename}`, publication: req.body.publication},
         {
-            where: {id: req.body.id}
+            where: {id: req.body.id, userId: user}
         } ).then( () => res.status( 200 ).json( {message: 'Post modifiée !'} ) )
         .catch( error => res.status( 400 ).json( {error} ) );
 };
@@ -44,17 +63,15 @@ exports.updatePost = (req, res, next) => {
 
 // Supprimer un post //
 exports.deletePost = (req, res) => {
-    const token = req.headers.authorization.split( ' ' )[1];
-    const decodedToken = jwt.verify( token, 'RANDOM_SECRET_KEY' );
-    const user = decodedToken.user;
 
     models.Comments.destroy({where: {postId:req.params.id} }).then(() => {
+        const user = getUserFromJwt(req.headers.authorization);
         models.Posts.destroy( {
-            where: {id: req.params.id, userId: user.id}
+            where: {id: req.params.id, userId: user}
         } ).then( () => {
             res.status( 200 ).json( {message: 'post supprimé !'} );
         } )
             .catch( error => res.status( 400 ).json( {error} ) );
     })
-        .catch( error => res.status( 400 ).json( {error} ) );;
+        .catch( error => res.status( 400 ).json( {error} ) );
 };

@@ -6,6 +6,5 @@ import 'bootstrap/scss/bootstrap.scss'
 import router from './router'
 import store from './store'
 
-import VueSimpleAlert from "vue3-simple-alert"
 
-createApp(App).use(store).use(router).use(VueSimpleAlert).mount('#app')
+createApp(App).use(store).use(router).mount('#app')
